@@ -146,6 +146,7 @@ class DatabaseManager {
             CREATE TABLE IF NOT EXISTS sections (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
+                user_id TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
@@ -160,6 +161,7 @@ class DatabaseManager {
                 parent_id TEXT,
                 level INTEGER DEFAULT 0,
                 position INTEGER DEFAULT 0,
+                user_id TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE,
@@ -300,11 +302,11 @@ class DatabaseManager {
     /**
      * Cria uma nova seção
      */
-    async createSection(name) {
+    async createSection(name, userId = null) {
         const id = 'section_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        const sql = `INSERT INTO sections (id, name) VALUES (?, ?)`;
-        await this.exec(sql, [id, name]);
-        return { id, name, created_at: new Date().toISOString() };
+        const sql = `INSERT INTO sections (id, name, user_id) VALUES (?, ?, ?)`;
+        await this.exec(sql, [id, name, userId]);
+        return { id, name, user_id: userId, created_at: new Date().toISOString() };
     }
 
     /**
@@ -336,11 +338,11 @@ class DatabaseManager {
     /**
      * Cria um novo caderno
      */
-    async createNotebook(name, sectionId = null, parentId = null, level = 0) {
+    async createNotebook(name, sectionId = null, content = '', userId = null, parentId = null, level = 0) {
         const id = 'notebook_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        const sql = `INSERT INTO notebooks (id, name, section_id, parent_id, level) VALUES (?, ?, ?, ?, ?)`;
-        await this.exec(sql, [id, name, sectionId, parentId, level]);
-        return { id, name, section_id: sectionId, parent_id: parentId, level, content: '' };
+        const sql = `INSERT INTO notebooks (id, name, content, section_id, parent_id, level, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        await this.exec(sql, [id, name, content, sectionId, parentId, level, userId]);
+        return { id, name, content, section_id: sectionId, parent_id: parentId, level, user_id: userId };
     }
 
     /**
