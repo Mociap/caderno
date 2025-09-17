@@ -103,12 +103,23 @@ class NotebookSystem {
         const sectionDiv = document.createElement('div');
         sectionDiv.className = 'section-item';
         sectionDiv.innerHTML = `
-            <div class="section-header" onclick="toggleSection('${section.id}')">
-                <i class="fas fa-folder"></i>
+            <div class="section-content">
+                <button class="expand-btn" onclick="toggleSection('${section.id}')" title="Expandir/Recolher">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <i class="section-icon fas fa-folder"></i>
                 <span class="section-name">${section.name}</span>
-                <i class="fas fa-chevron-down section-toggle"></i>
+                <span class="notebook-count">0</span>
+                <div class="section-actions">
+                    <button class="action-btn add" onclick="createNewNotebook('${section.id}')" title="Adicionar Caderno">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="deleteSection('${section.id}')" title="Excluir Seção">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
-            <div class="notebooks-container" id="notebooks-${section.id}">
+            <div class="notebook-children collapsed" id="notebooks-${section.id}">
                 <!-- Notebooks serão carregados aqui -->
             </div>
         `;
@@ -130,6 +141,12 @@ class NotebookSystem {
                 const notebookElement = this.createNotebookElement(notebook);
                 container.appendChild(notebookElement);
             });
+
+            // Atualizar contador de cadernos na seção
+            const countElement = container.parentElement.querySelector('.notebook-count');
+            if (countElement) {
+                countElement.textContent = notebooks.length;
+            }
         } catch (error) {
             console.error('Erro ao carregar notebooks da seção:', error);
         }
@@ -137,19 +154,20 @@ class NotebookSystem {
 
     createNotebookElement(notebook) {
         const notebookDiv = document.createElement('div');
-        notebookDiv.className = 'notebook-item';
+        notebookDiv.className = 'notebook-item level-1';
         notebookDiv.innerHTML = `
             <div class="notebook-content" onclick="selectNotebook('${notebook.id}')">
-                <i class="fas fa-book"></i>
+                <div class="expand-placeholder"></div>
+                <i class="notebook-icon fas fa-book"></i>
                 <span class="notebook-name">${notebook.title}</span>
-            </div>
-            <div class="notebook-actions">
-                <button onclick="editNotebook('${notebook.id}')" title="Editar">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="deleteNotebook('${notebook.id}')" title="Excluir">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="notebook-actions">
+                    <button class="action-btn edit" onclick="event.stopPropagation(); editNotebook('${notebook.id}')" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="event.stopPropagation(); deleteNotebook('${notebook.id}')" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
         `;
         return notebookDiv;
@@ -237,29 +255,30 @@ async function createNewSection() {
     }
 }
 
-async function createNewNotebook() {
+async function createNewNotebook(sectionId = null) {
     const title = prompt('Título do novo caderno:');
     if (title && title.trim()) {
-        // Verificar se há seções disponíveis
         try {
-            const sections = await apiManager.getSections();
-            if (sections.length === 0) {
-                notebookSystem.showError('Crie uma seção primeiro');
-                return;
-            }
-
-            // Se há apenas uma seção, usar ela. Senão, perguntar qual usar
-            let sectionId;
-            if (sections.length === 1) {
-                sectionId = sections[0].id;
-            } else {
-                const sectionName = prompt(`Escolha uma seção:\n${sections.map(s => s.name).join('\n')}`);
-                const selectedSection = sections.find(s => s.name === sectionName);
-                if (!selectedSection) {
-                    notebookSystem.showError('Seção não encontrada');
+            // Se não foi passado sectionId, verificar se há seções disponíveis
+            if (!sectionId) {
+                const sections = await apiManager.getSections();
+                if (sections.length === 0) {
+                    notebookSystem.showError('Crie uma seção primeiro');
                     return;
                 }
-                sectionId = selectedSection.id;
+
+                // Se há apenas uma seção, usar ela. Senão, perguntar qual usar
+                if (sections.length === 1) {
+                    sectionId = sections[0].id;
+                } else {
+                    const sectionName = prompt(`Escolha uma seção:\n${sections.map(s => s.name).join('\n')}`);
+                    const selectedSection = sections.find(s => s.name === sectionName);
+                    if (!selectedSection) {
+                        notebookSystem.showError('Seção não encontrada');
+                        return;
+                    }
+                    sectionId = selectedSection.id;
+                }
             }
 
             await apiManager.createNotebook({
@@ -277,17 +296,35 @@ async function createNewNotebook() {
     }
 }
 
+async function deleteSection(sectionId) {
+    if (confirm('Tem certeza que deseja excluir esta seção? Todos os cadernos serão removidos.')) {
+        try {
+            await apiManager.deleteSection(sectionId);
+            await notebookSystem.loadNotebooks();
+            notebookSystem.showSuccess('Seção excluída com sucesso!');
+        } catch (error) {
+            console.error('Erro ao excluir seção:', error);
+            notebookSystem.showError('Erro ao excluir seção');
+        }
+    }
+}
+
 async function toggleSection(sectionId) {
     const container = document.getElementById(`notebooks-${sectionId}`);
-    const toggle = document.querySelector(`[onclick="toggleSection('${sectionId}')"] .section-toggle`);
+    const expandBtn = document.querySelector(`[onclick="toggleSection('${sectionId}')"]`);
+    const icon = expandBtn?.querySelector('i');
     
-    if (container && toggle) {
-        if (container.style.display === 'none') {
-            container.style.display = 'block';
-            toggle.style.transform = 'rotate(0deg)';
+    if (container && expandBtn && icon) {
+        const isCollapsed = container.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+            container.classList.remove('collapsed');
+            expandBtn.classList.add('expanded');
+            icon.className = 'fas fa-chevron-down';
         } else {
-            container.style.display = 'none';
-            toggle.style.transform = 'rotate(-90deg)';
+            container.classList.add('collapsed');
+            expandBtn.classList.remove('expanded');
+            icon.className = 'fas fa-chevron-right';
         }
     }
 }
