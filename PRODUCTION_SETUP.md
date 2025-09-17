@@ -4,7 +4,7 @@
 Sua aplicação no GitHub Pages (`https://mociap.github.io`) está tentando se conectar ao `localhost:3000`, causando erro de CORS.
 
 ## ✅ Soluções Implementadas
-
+##
 ### 1. CORS Configurado
 O servidor já está configurado para aceitar requisições do GitHub Pages:
 ```javascript

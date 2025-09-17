@@ -3,7 +3,7 @@ class ApiManager {
     constructor() {
         // Detecta automaticamente o ambiente
         const isProduction = window.location.hostname === 'mociap.github.io';
-        
+        //
         // Configuração da URL da API
         if (isProduction) {
             // Em produção, tenta usar URL configurada ou padrão Railway
