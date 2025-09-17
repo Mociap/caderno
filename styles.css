@@ -1,0 +1,1695 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Painel Lateral */
+.sidebar {
+    width: 280px;
+    background-color: #2c3e50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid #34495e;
+}
+
+.sidebar-header h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-new-notebook {
+    flex: 1;
+    padding: 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.btn-new-notebook:hover {
+    background-color: #2980b9;
+}
+
+.btn-new-section {
+    padding: 10px 12px;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-new-section:hover {
+    background-color: #229954;
+}
+
+.notebooks-list {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* Seções */
+.section-item {
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background-color: #34495e;
+    border: 1px solid #3d566e;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.section-item:hover {
+    background-color: #3d566e;
+    border-color: #4a6741;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.section-content {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 10px;
+    position: relative;
+}
+
+.section-icon {
+    font-size: 16px;
+    color: #27ae60;
+    min-width: 16px;
+}
+
+.section-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ecf0f1;
+}
+
+.notebook-count {
+    background-color: #27ae60;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Cadernos */
+.notebook-item {
+    margin-bottom: 2px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    background-color: transparent;
+}
+
+.notebook-item:hover {
+    background-color: #34495e;
+}
+
+.notebook-item.active {
+    background-color: #3498db;
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+}
+
+.notebook-item.level-1 {
+    margin-left: 24px;
+    border-left: 2px solid #3d566e;
+    padding-left: 8px;
+}
+
+.notebook-item.level-2 {
+    margin-left: 48px;
+    border-left: 2px solid #3d566e;
+    padding-left: 8px;
+}
+
+.notebook-item.level-3 {
+    margin-left: 72px;
+    border-left: 2px solid #3d566e;
+    padding-left: 8px;
+}
+
+.notebook-content {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    gap: 10px;
+    position: relative;
+}
+
+/* Botão de expandir/recolher */
+.expand-btn {
+    background: none;
+    border: none;
+    color: #95a5a6;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 12px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.expand-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ecf0f1;
+}
+
+.expand-btn.expanded {
+    color: #27ae60;
+}
+
+.expand-placeholder {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+}
+
+.notebook-icon {
+    font-size: 14px;
+    color: #95a5a6;
+    min-width: 16px;
+}
+
+.notebook-name {
+    flex: 1;
+    font-size: 14px;
+    color: #ecf0f1;
+    font-weight: 400;
+}
+
+/* Ações (botões) */
+.section-actions,
+.notebook-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.section-item:hover .section-actions,
+.notebook-item:hover .notebook-actions {
+    opacity: 1;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: #95a5a6;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ecf0f1;
+}
+
+.action-btn.add:hover {
+    background-color: #27ae60;
+    color: white;
+}
+
+.action-btn.delete:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+
+
+.notebook-children {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.notebook-children.collapsed {
+    max-height: 0;
+}
+
+/* Área Principal */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+/* Barra de Ferramentas */
+.toolbar {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px;
+    border-right: 1px solid #dee2e6;
+}
+
+.toolbar-group:last-child {
+    border-right: none;
+}
+
+.toolbar-btn {
+    padding: 8px 10px;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #495057;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.toolbar-btn:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.toolbar-btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Botão de Salvar */
+.save-group {
+    margin-left: auto;
+    border-right: none !important;
+    gap: 15px;
+}
+
+.save-btn {
+    background-color: #28a745 !important;
+    color: white !important;
+    border-color: #28a745 !important;
+    font-weight: bold;
+}
+
+.save-btn:hover {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+}
+
+.save-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.save-status.saving {
+    color: #ffc107;
+}
+
+.save-status.saved {
+    color: #28a745;
+}
+
+.save-status.unsaved {
+    color: #dc3545;
+}
+
+.save-status i {
+    font-size: 8px;
+}
+
+.save-status.saving i {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.font-size-select {
+    padding: 6px 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.color-picker {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    background: none;
+}
+
+/* Área de Edição */
+.editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.notebook-title {
+    margin-bottom: 20px;
+}
+
+.notebook-title input {
+    width: 100%;
+    padding: 15px 0;
+    font-size: 28px;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #2c3e50;
+}
+
+.notebook-title input::placeholder {
+    color: #bdc3c7;
+}
+
+.editor {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-y: auto;
+    outline: none;
+    min-height: 400px;
+}
+
+.editor:empty::before {
+    content: attr(placeholder);
+    color: #adb5bd;
+    font-style: italic;
+}
+
+.editor p {
+    margin-bottom: 10px;
+}
+
+.editor h1, .editor h2, .editor h3 {
+    margin: 20px 0 10px 0;
+    color: #2c3e50;
+}
+
+.editor ul, .editor ol {
+    margin: 10px 0;
+    padding-left: 30px;
+}
+
+.editor li {
+    margin-bottom: 5px;
+}
+
+/* Scrollbar personalizada */
+.notebooks-list::-webkit-scrollbar,
+.editor::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notebooks-list::-webkit-scrollbar-track,
+.editor::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.notebooks-list::-webkit-scrollbar-thumb,
+.editor::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.notebooks-list::-webkit-scrollbar-thumb:hover,
+.editor::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 250px;
+    }
+    
+    .toolbar {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .toolbar-group {
+        padding: 0 5px;
+    }
+    
+    .editor-container {
+        padding: 15px;
+    }
+    
+    .notebook-title input {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 600px) {
+    .app-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: 200px;
+    }
+    
+    .notebooks-list {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    
+    .notebook-item {
+        min-width: 150px;
+        margin-bottom: 0;
+    }
+    
+    .toolbar {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* Animações */
+.notebook-item,
+.toolbar-btn,
+.btn-new-notebook {
+    transition: all 0.3s ease;
+}
+
+.editor {
+    transition: border-color 0.3s ease;
+}
+
+.editor:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Menu de Contexto */
+.context-menu {
+    position: fixed;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 200px;
+    display: none;
+}
+
+.context-menu-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.3s;
+}
+
+.context-menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+.context-menu-item:first-child {
+    border-radius: 6px 6px 0 0;
+}
+
+.context-menu-item:last-child {
+    border-radius: 0 0 6px 6px;
+}
+
+.context-menu-item.danger {
+    color: #e74c3c;
+}
+
+.context-menu-item.danger:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.context-menu-separator {
+    height: 1px;
+    background-color: #dee2e6;
+    margin: 5px 0;
+}
+
+/* Botão de Sincronização */
+.sync-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 10px;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+}
+
+.sync-btn:hover {
+    background: linear-gradient(135deg, #3730a3 0%, #6b21a8 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    color: white !important;
+}
+
+.sync-btn:disabled {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    color: white !important;
+}
+
+.sync-btn i {
+    font-size: 12px;
+    color: white !important;
+}
+
+.sync-btn .fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Estados do botão de sincronização */
+.sync-btn.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+}
+
+.sync-btn.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+}
+
+/* Garantir que o botão não seja sobrescrito por outros estilos */
+button.sync-btn,
+.toolbar button.sync-btn,
+.btn.sync-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+button.sync-btn:hover,
+.toolbar button.sync-btn:hover,
+.btn.sync-btn:hover {
+    background: linear-gradient(135deg, #3730a3 0%, #6b21a8 100%) !important;
+    color: white !important;
+}
+
+/* Indicador de status de sincronização */
+.sync-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.sync-status.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.sync-status.success {
+    background: #4CAF50;
+}
+
+.sync-status.error {
+    background: #f44336;
+}
+
+.sync-status.info {
+    background: #2196F3;
+}
+
+/* Melhorias na toolbar */
+.toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 8px 8px 0 0;
+}
+
+.toolbar .btn-group {
+    display: flex;
+    gap: 2px;
+}
+
+.toolbar .btn {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.toolbar .btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.toolbar .btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+    .sync-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .sync-btn span {
+        display: none;
+    }
+    
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 3px;
+    }
+    
+    .toolbar .btn {
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+}
+
+/* Animação de carregamento para sincronização */
+.syncing-indicator {
+    position: relative;
+    overflow: hidden;
+}
+
+.syncing-indicator::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* ===== TELA DE LOGIN ===== */
+.login-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-header {
+    margin-bottom: 30px;
+}
+
+.login-header i {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.login-header h1 {
+    color: #333;
+    margin: 0 0 10px 0;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.login-header p {
+    color: #666;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.login-form {
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.error-message {
+    display: block;
+    color: #e74c3c;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    min-height: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-login, .btn-register {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-register {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-register:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.login-divider {
+    position: relative;
+    text-align: center;
+    margin: 25px 0;
+}
+
+.login-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e1e5e9;
+}
+
+.login-divider span {
+    background: white;
+    padding: 0 15px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+
+
+.login-status {
+    margin-top: 20px;
+}
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #667eea;
+    font-size: 0.9rem;
+}
+
+.loading-spinner i {
+    font-size: 1.2rem;
+}
+
+.status-message {
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.status-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Drag and Drop Styles */
+.dragging {
+    opacity: 0.5 !important;
+    transform: rotate(2deg);
+    z-index: 1000;
+}
+
+.drop-zone-active {
+    background-color: rgba(52, 152, 219, 0.1) !important;
+    border: 2px dashed #3498db !important;
+    border-radius: 6px;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+.section-item.drop-zone-active {
+    background-color: rgba(52, 152, 219, 0.15) !important;
+}
+
+.notebook-item.drop-zone-active {
+    background-color: rgba(46, 204, 113, 0.1) !important;
+    border-color: #2ecc71 !important;
+}
+
+/* Cursor durante drag */
+.section-item[draggable="true"]:hover,
+.notebook-item[draggable="true"]:hover {
+    cursor: grab;
+}
+
+.section-item[draggable="true"]:active,
+.notebook-item[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Animação suave para reorganização */
+.section-item,
+.notebook-item {
+    transition: all 0.3s ease;
+}
+
+/* User Info */
+.user-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.btn-logout {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.btn-logout:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+/* Responsividade para mobile */
+@media (max-width: 480px) {
+    .login-card {
+        margin: 20px;
+        padding: 30px 25px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-login, .btn-register {
+        width: 100%;
+    }
+}
+
+/* User Info Styles */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 0.9em;
+}
+
+.user-info span {
+    color: #e2e8f0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.logout-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    color: #e2e8f0 !important;
+    padding: 6px 8px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.9em !important;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #ff6b6b !important;
+    transform: translateY(-1px) !important;
+}
+
+.logout-btn:active {
+    transform: translateY(0) !important;
+}
+
+.toolbar-item,
+.toolbar-btn,
+.btn-new-notebook {
+    transition: all 0.3s ease;
+}
+
+.editor {
+    transition: border-color 0.3s ease;
+}
+
+.editor:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Menu de Contexto */
+.context-menu {
+    position: fixed;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 200px;
+    display: none;
+}
+
+.context-menu-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.3s;
+}
+
+.context-menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+.context-menu-item:first-child {
+    border-radius: 6px 6px 0 0;
+}
+
+.context-menu-item:last-child {
+    border-radius: 0 0 6px 6px;
+}
+
+.context-menu-item.danger {
+    color: #e74c3c;
+}
+
+.context-menu-item.danger:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.context-menu-separator {
+    height: 1px;
+    background-color: #dee2e6;
+    margin: 5px 0;
+}
+
+/* Botão de Sincronização */
+.sync-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 10px;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+}
+
+.sync-btn:hover {
+    background: linear-gradient(135deg, #3730a3 0%, #6b21a8 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    color: white !important;
+}
+
+.sync-btn:disabled {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    color: white !important;
+}
+
+.sync-btn i {
+    font-size: 12px;
+    color: white !important;
+}
+
+.sync-btn .fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Estados do botão de sincronização */
+.sync-btn.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+}
+
+.sync-btn.error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+}
+
+/* Garantir que o botão não seja sobrescrito por outros estilos */
+button.sync-btn,
+.toolbar button.sync-btn,
+.btn.sync-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+button.sync-btn:hover,
+.toolbar button.sync-btn:hover,
+.btn.sync-btn:hover {
+    background: linear-gradient(135deg, #3730a3 0%, #6b21a8 100%) !important;
+    color: white !important;
+}
+
+/* Indicador de status de sincronização */
+.sync-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.sync-status.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.sync-status.success {
+    background: #4CAF50;
+}
+
+.sync-status.error {
+    background: #f44336;
+}
+
+.sync-status.info {
+    background: #2196F3;
+}
+
+/* Melhorias na toolbar */
+.toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 8px 8px 0 0;
+}
+
+.toolbar .btn-group {
+    display: flex;
+    gap: 2px;
+}
+
+.toolbar .btn {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.toolbar .btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.toolbar .btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Botão de Salvar */
+.save-group {
+    margin-left: auto;
+    border-right: none !important;
+    gap: 15px;
+}
+
+.save-btn {
+    background-color: #28a745 !important;
+    color: white !important;
+    border-color: #28a745 !important;
+    font-weight: bold;
+}
+
+.save-btn:hover {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+}
+
+.save-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.save-status.saving {
+    color: #ffc107;
+}
+
+.save-status.saved {
+    color: #28a745;
+}
+
+.save-status.unsaved {
+    color: #dc3545;
+}
+
+.save-status i {
+    font-size: 8px;
+}
+
+.save-status.saving i {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+    .sync-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .sync-btn span {
+        display: none;
+    }
+    
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 3px;
+    }
+    
+    .toolbar .btn {
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+}
+
+/* Animação de carregamento para sincronização */
+.syncing-indicator {
+    position: relative;
+    overflow: hidden;
+}
+
+.syncing-indicator::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* ===== TELA DE LOGIN ===== */
+.login-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-header {
+    margin-bottom: 30px;
+}
+
+.login-header i {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.login-header h1 {
+    color: #333;
+    margin: 0 0 10px 0;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.login-header p {
+    color: #666;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.login-form {
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.error-message {
+    display: block;
+    color: #e74c3c;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    min-height: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-login, .btn-register {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-register {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-register:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.login-divider {
+    position: relative;
+    text-align: center;
+    margin: 25px 0;
+}
+
+.login-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e1e5e9;
+}
+
+.login-divider span {
+    background: white;
+    padding: 0 15px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+
+
+.login-status {
+    margin-top: 20px;
+}
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #667eea;
+    font-size: 0.9rem;
+}
+
+.loading-spinner i {
+    font-size: 1.2rem;
+}
+
+.status-message {
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.status-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Drag and Drop Styles */
+.dragging {
+    opacity: 0.5 !important;
+    transform: rotate(2deg);
+    z-index: 1000;
+}
+
+.drop-zone-active {
+    background-color: rgba(52, 152, 219, 0.1) !important;
+    border: 2px dashed #3498db !important;
+    border-radius: 6px;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+.section-item.drop-zone-active {
+    background-color: rgba(52, 152, 219, 0.15) !important;
+}
+
+.notebook-item.drop-zone-active {
+    background-color: rgba(46, 204, 113, 0.1) !important;
+    border-color: #2ecc71 !important;
+}
+
+/* Cursor durante drag */
+.section-item[draggable="true"]:hover,
+.notebook-item[draggable="true"]:hover {
+    cursor: grab;
+}
+
+.section-item[draggable="true"]:active,
+.notebook-item[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Animação suave para reorganização */
+.section-item,
+.notebook-item {
+    transition: all 0.3s ease;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 480px) {
+    .login-card {
+        margin: 20px;
+        padding: 30px 25px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-login, .btn-register {
+        width: 100%;
+    }
+}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Cadernos - Sistema de Notas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- API Manager -->
+    <script src="api.js"></script>
+    <!-- Authentication System -->
+    <script src="auth.js"></script>
+</head>
+<body>
+    <!-- Container Principal da Aplicação -->
+    <div class="app-container" id="appContainer">
+        <!-- Painel Lateral -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-book"></i> Book Notion</h1>
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <span id="userName"></span>
+                    <button class="btn-logout" onclick="logout()" title="Sair">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <h2><i class="fas fa-book"></i> Meus Cadernos</h2>
+            <div class="header-buttons">
+                <button class="btn-new-notebook" onclick="createNewNotebook()">
+                    <i class="fas fa-plus"></i> Novo Caderno
+                </button>
+                <button class="btn-new-section" onclick="createNewSection()" title="Nova Seção">
+                    <i class="fas fa-folder-plus"></i>
+                </button>
+                <button class="btn-debug" onclick="debugIndexedDB()" title="Debug IndexedDB">
+                    <i class="fas fa-bug"></i> Debug
+                </button>
+            </div>
+            
+            <!-- Lista de Notebooks -->
+            <div class="notebooks-list" id="notebooksList">
+                <!-- Os notebooks serão renderizados aqui pelo JavaScript -->
+            </div>
+        </div>
+
+        <!-- Área Principal -->
+        <div class="main-content">
+            <!-- Barra de Ferramentas -->
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatText('bold')" title="Negrito">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button class="toolbar-btn" onclick="formatText('italic')" title="Itálico">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button class="toolbar-btn" onclick="formatText('underline')" title="Sublinhado">
+                        <i class="fas fa-underline"></i>
+                    </button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <select class="font-size-select" onchange="changeFontSize(this.value)">
+                        <option value="12px">12px</option>
+                        <option value="14px" selected>14px</option>
+                        <option value="16px">16px</option>
+                        <option value="18px">18px</option>
+                        <option value="20px">20px</option>
+                        <option value="24px">24px</option>
+                        <option value="28px">28px</option>
+                        <option value="32px">32px</option>
+                    </select>
+                    
+                    <input type="color" class="color-picker" onchange="changeTextColor(this.value)" title="Cor do Texto">
+                    <input type="color" class="color-picker" onchange="changeBackgroundColor(this.value)" title="Cor de Fundo" value="#ffffff">
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatText('justifyLeft')" title="Alinhar à Esquerda">
+                        <i class="fas fa-align-left"></i>
+                    </button>
+                    <button class="toolbar-btn" onclick="formatText('justifyCenter')" title="Centralizar">
+                        <i class="fas fa-align-center"></i>
+                    </button>
+                    <button class="toolbar-btn" onclick="formatText('justifyRight')" title="Alinhar à Direita">
+                        <i class="fas fa-align-right"></i>
+                    </button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatText('insertUnorderedList')" title="Lista com Marcadores">
+                        <i class="fas fa-list-ul"></i>
+                    </button>
+                    <button class="toolbar-btn" onclick="formatText('insertOrderedList')" title="Lista Numerada">
+                        <i class="fas fa-list-ol"></i>
+                    </button>
+                </div>
+                
+                <div class="toolbar-group save-group">
+                    <button class="toolbar-btn save-btn" onclick="manualSave()" title="Salvar Caderno (Ctrl+S)">
+                        <i class="fas fa-save"></i>
+                    </button>
+                    <span class="save-status" id="saveStatus">
+                        <i class="fas fa-circle"></i>
+                        <span class="save-text">Salvo</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Área de Edição -->
+            <div class="editor-container">
+                <div class="notebook-title">
+                    <input type="text" id="notebookTitle" placeholder="Título do Caderno" onchange="updateNotebookTitle()">
+                </div>
+                
+                <div class="editor" id="editor" contenteditable="true" placeholder="Comece a escrever suas notas aqui...">
+                    <p>Bem-vindo ao seu sistema de cadernos! Clique aqui para começar a escrever.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu de Contexto -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" onclick="createSubNotebook()">
+            <i class="fas fa-plus"></i> Adicionar Subcaderno
+        </div>
+        <div class="context-menu-item" onclick="createSiblingNotebook()">
+            <i class="fas fa-file-plus"></i> Novo Caderno no Mesmo Nível
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" onclick="moveToSection()">
+            <i class="fas fa-arrows-alt"></i> Mover para Seção
+        </div>
+        <div class="context-menu-item danger" onclick="deleteSelectedNotebook()">
+            <i class="fas fa-trash"></i> Excluir
+        </div>
+    </div>
+
+
+    
+    <script src="database.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+<div class="header">
+    <h1>📚 Book Notion</h1>
+    <div class="header-actions">
+        <button id="debugBtn" class="debug-btn" title="Debug IndexedDB">🔍 Debug</button>
+        <button id="addSectionBtn" class="add-btn">+ Nova Seção</button>
+    </div>
+</div>

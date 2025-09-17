@@ -1,0 +1,172 @@
+// Classe para gerenciar chamadas da API
+class ApiManager {
+    constructor() {
+        this.baseUrl = 'http://localhost:3000/api';
+        this.token = localStorage.getItem('authToken');
+    }
+
+    // Método para fazer requisições HTTP
+    async request(endpoint, options = {}) {
+        const url = `${this.baseUrl}${endpoint}`;
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            },
+            ...options
+        };
+
+        // Adiciona token de autenticação se disponível
+        if (this.token) {
+            config.headers['Authorization'] = `Bearer ${this.token}`;
+        }
+
+        try {
+            const response = await fetch(url, config);
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Preservar informações detalhadas do erro
+                const error = new Error(data.error || data.message || 'Erro na requisição');
+                error.code = data.code;
+                error.message = data.message || data.error;
+                error.status = response.status;
+                error.data = data;
+                throw error;
+            }
+
+            return data;
+        } catch (error) {
+            // Se for erro de rede (fetch falhou)
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                const networkError = new Error('Erro de conexão. Verifique se o servidor está funcionando.');
+                networkError.code = 'NETWORK_ERROR';
+                throw networkError;
+            }
+            
+            console.error('Erro na API:', error);
+            throw error;
+        }
+    }
+
+    // Métodos de autenticação
+    async register(username, email, password) {
+        const data = await this.request('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({ username, email, password })
+        });
+        
+        if (data.token) {
+            this.token = data.token;
+            localStorage.setItem('authToken', this.token);
+        }
+        
+        return data;
+    }
+
+    async login(email, password) {
+        const data = await this.request('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password })
+        });
+        
+        if (data.token) {
+            this.token = data.token;
+            localStorage.setItem('authToken', this.token);
+        }
+        
+        return data;
+    }
+
+    async logout() {
+        this.token = null;
+        localStorage.removeItem('authToken');
+    }
+
+    async getCurrentUser() {
+        return await this.request('/auth/me');
+    }
+
+    // Métodos para seções
+    async getSections() {
+        return await this.request('/sections');
+    }
+
+    async createSection(name) {
+        return await this.request('/sections', {
+            method: 'POST',
+            body: JSON.stringify({ name })
+        });
+    }
+
+    async updateSection(id, name) {
+        return await this.request(`/sections/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ name })
+        });
+    }
+
+    async deleteSection(id) {
+        return await this.request(`/sections/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async getSectionNotebooks(sectionId) {
+        return await this.request(`/sections/${sectionId}/notebooks`);
+    }
+
+    // Métodos para cadernos
+    async getNotebooks() {
+        return await this.request('/notebooks');
+    }
+
+    async createNotebook(name, sectionId, content = '') {
+        return await this.request('/notebooks', {
+            method: 'POST',
+            body: JSON.stringify({ name, section_id: sectionId, content })
+        });
+    }
+
+    async updateNotebook(id, name, content, sectionId) {
+        return await this.request(`/notebooks/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ name, content, section_id: sectionId })
+        });
+    }
+
+    async updateNotebookContent(id, content) {
+        return await this.request(`/notebooks/${id}/content`, {
+            method: 'PATCH',
+            body: JSON.stringify({ content })
+        });
+    }
+
+    async deleteNotebook(id) {
+        return await this.request(`/notebooks/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async duplicateNotebook(id) {
+        return await this.request(`/notebooks/${id}/duplicate`, {
+            method: 'POST'
+        });
+    }
+
+    async searchNotebooks(query, sectionId = null) {
+        const params = new URLSearchParams({ query });
+        if (sectionId) {
+            params.append('section_id', sectionId);
+        }
+        return await this.request(`/notebooks/search?${params}`);
+    }
+
+    // Verificar se está autenticado
+    isAuthenticated() {
+        return !!this.token;
+    }
+}
+
+// Instância global da API
+window.apiManager = new ApiManager();
