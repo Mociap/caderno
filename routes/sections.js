@@ -10,10 +10,10 @@ router.use(authenticateToken);
  * GET /api/sections
  * Busca todas as seções do usuário
  */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const sections = req.db.getSectionsByUser(req.user.userId);
-        res.json(sections);
+        const sections = await req.db.getSectionsByUser(req.user.userId);
+        res.json(sections || []);
     } catch (error) {
         console.error('Erro ao buscar seções:', error);
         res.status(500).json({ error: 'Erro interno do servidor' });
@@ -24,10 +24,10 @@ router.get('/', (req, res) => {
  * GET /api/sections/:id
  * Busca uma seção específica
  */
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const section = req.db.getItemById(id, req.user.userId);
+        const section = await req.db.getItemById(id, req.user.userId);
         
         if (!section || section.type !== 'section') {
             return res.status(404).json({ error: 'Seção não encontrada' });
@@ -44,7 +44,7 @@ router.get('/:id', (req, res) => {
  * POST /api/sections
  * Cria uma nova seção
  */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const { name } = req.body;
 
@@ -52,7 +52,7 @@ router.post('/', (req, res) => {
             return res.status(400).json({ error: 'Nome da seção é obrigatório' });
         }
 
-        const section = req.db.createSection(name.trim(), req.user.userId);
+        const section = await req.db.createSection(name.trim(), req.user.userId);
         res.status(201).json(section);
 
     } catch (error) {
