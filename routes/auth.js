@@ -39,8 +39,9 @@ router.post('/register', async (req, res) => {
         }
 
         // Verifica se usuário já existe
-        const existingUser = req.db.getUserByEmail(email) || req.db.getUserByUsername(username);
-        if (existingUser) {
+        const existingUserByEmail = await req.db.getUserByEmail(email);
+        const existingUserByUsername = await req.db.getUserByUsername(username);
+        if (existingUserByEmail || existingUserByUsername) {
             return res.status(409).json({ error: 'Usuário já existe' });
         }
 
@@ -49,8 +50,8 @@ router.post('/register', async (req, res) => {
         const passwordHash = await bcrypt.hash(password, saltRounds);
 
         // Cria o usuário
-        const result = req.db.createUser(username, email, passwordHash);
-        const userId = result.lastInsertRowid;
+        const result = await req.db.createUser(username, email, passwordHash);
+        const userId = result.id;
 
         // Gera token JWT
         const token = jwt.sign(
@@ -85,7 +86,7 @@ router.post('/login', async (req, res) => {
         }
 
         // Busca o usuário
-        const user = req.db.getUserByEmail(email);
+        const user = await req.db.getUserByEmail(email);
         if (!user) {
             return res.status(404).json({ 
                 error: 'Usuário não encontrado',
@@ -127,9 +128,9 @@ router.post('/login', async (req, res) => {
  * GET /api/auth/me
  * Retorna informações do usuário autenticado
  */
-router.get('/me', authenticateToken, (req, res) => {
+router.get('/me', authenticateToken, async (req, res) => {
     try {
-        const user = req.db.getUserById(req.user.userId);
+        const user = await req.db.getUserById(req.user.userId);
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
