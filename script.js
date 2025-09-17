@@ -162,7 +162,7 @@ class NotebookSystem {
             <div class="notebook-content" onclick="selectNotebook('${notebook.id}')">
                 <div class="expand-placeholder"></div>
                 <i class="notebook-icon fas fa-book"></i>
-                <span class="notebook-name">${notebook.title}</span>
+                <span class="notebook-name">${notebook.name}</span>
                 <div class="notebook-actions">
                     <button class="action-btn edit" onclick="event.stopPropagation(); editNotebook('${notebook.id}')" title="Editar">
                         <i class="fas fa-edit"></i>
@@ -199,7 +199,7 @@ class NotebookSystem {
         // Atualizar título na interface
         const titleElement = document.querySelector('.main-content h1');
         if (titleElement) {
-            titleElement.textContent = notebook.title;
+            titleElement.textContent = notebook.name;
         }
     }
 
