@@ -78,7 +78,9 @@ class NotebookSystem {
     async loadNotebooks() {
         try {
             const sections = await apiManager.getSections();
-            this.renderNotebooksList(sections);
+            // Garante que sections seja sempre um array
+            const sectionsArray = Array.isArray(sections) ? sections : [];
+            this.renderNotebooksList(sectionsArray);
         } catch (error) {
             console.error('Erro ao carregar cadernos:', error);
             this.showError('Erro ao carregar cadernos');
