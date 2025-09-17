@@ -18,7 +18,7 @@ class NotebookSystem {
         const token = localStorage.getItem('authToken');
         if (token) {
             try {
-                const user = await api.getCurrentUser();
+                const user = await apiManager.getCurrentUser();
                 if (user) {
                     this.isAuthenticated = true;
                     this.showMainApp();
@@ -77,7 +77,7 @@ class NotebookSystem {
 
     async loadNotebooks() {
         try {
-            const sections = await api.getSections();
+            const sections = await apiManager.getSections();
             this.renderNotebooksList(sections);
         } catch (error) {
             console.error('Erro ao carregar cadernos:', error);
@@ -119,7 +119,7 @@ class NotebookSystem {
 
     async loadNotebooksForSection(sectionId) {
         try {
-            const notebooks = await api.getNotebooks(sectionId);
+            const notebooks = await apiManager.getNotebooks(sectionId);
             const container = document.getElementById(`notebooks-${sectionId}`);
             if (!container) return;
 
@@ -155,7 +155,7 @@ class NotebookSystem {
 
     async selectNotebook(notebookId) {
         try {
-            const notebook = await api.getNotebook(notebookId);
+            const notebook = await apiManager.getNotebook(notebookId);
             if (notebook) {
                 this.currentNotebook = notebook;
                 this.displayNotebook(notebook);
@@ -199,7 +199,7 @@ class NotebookSystem {
         const content = this.editor.innerHTML;
         
         try {
-            await api.updateNotebook(this.currentNotebook.id, {
+            await apiManager.updateNotebook(this.currentNotebook.id, {
                 content: content
             });
             console.log('Conteúdo salvo automaticamente');
@@ -225,7 +225,7 @@ async function createNewSection() {
     const name = prompt('Nome da nova seção:');
     if (name && name.trim()) {
         try {
-            await api.createSection({ name: name.trim() });
+            await apiManager.createSection({ name: name.trim() });
             await notebookSystem.loadNotebooks();
             notebookSystem.showSuccess('Seção criada com sucesso!');
         } catch (error) {
@@ -240,7 +240,7 @@ async function createNewNotebook() {
     if (title && title.trim()) {
         // Verificar se há seções disponíveis
         try {
-            const sections = await api.getSections();
+            const sections = await apiManager.getSections();
             if (sections.length === 0) {
                 notebookSystem.showError('Crie uma seção primeiro');
                 return;
@@ -260,7 +260,7 @@ async function createNewNotebook() {
                 sectionId = selectedSection.id;
             }
 
-            await api.createNotebook({
+            await apiManager.createNotebook({
                 title: title.trim(),
                 section_id: sectionId,
                 content: ''
@@ -298,7 +298,7 @@ async function editNotebook(notebookId) {
     const newTitle = prompt('Novo título do caderno:');
     if (newTitle && newTitle.trim()) {
         try {
-            await api.updateNotebook(notebookId, { title: newTitle.trim() });
+            await apiManager.updateNotebook(notebookId, { title: newTitle.trim() });
             await notebookSystem.loadNotebooks();
             notebookSystem.showSuccess('Caderno atualizado com sucesso!');
         } catch (error) {
@@ -311,7 +311,7 @@ async function editNotebook(notebookId) {
 async function deleteNotebook(notebookId) {
     if (confirm('Tem certeza que deseja excluir este caderno?')) {
         try {
-            await api.deleteNotebook(notebookId);
+            await apiManager.deleteNotebook(notebookId);
             await notebookSystem.loadNotebooks();
             
             // Limpar editor se o caderno excluído estava selecionado

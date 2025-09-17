@@ -12,7 +12,7 @@ class AuthSystem {
         const token = localStorage.getItem('authToken');
         if (token) {
             try {
-                this.currentUser = await api.getCurrentUser();
+                this.currentUser = await apiManager.getCurrentUser();
                 this.hide();
             } catch (error) {
                 console.error('Token inválido:', error);
@@ -243,7 +243,7 @@ class AuthSystem {
 
         try {
             this.showMessage('Fazendo login...', 'info');
-            const result = await api.login(email, password);
+            const result = await apiManager.login(email, password);
             this.currentUser = result.user;
             this.showMessage('Login realizado com sucesso!', 'success');
             setTimeout(() => this.showMainApp(), 1000);

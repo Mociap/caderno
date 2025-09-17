@@ -56,13 +56,15 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS
+// Configuração de CORS
 app.use(cors({
     origin: [
         'http://localhost:3000',
         'http://localhost:8000', 
         'http://127.0.0.1:5500',
         'http://127.0.0.1:3000',
+        'https://mociap.github.io',
+        'https://mociap.github.io/caderno',
         process.env.FRONTEND_URL
     ].filter(Boolean),
     credentials: true,
