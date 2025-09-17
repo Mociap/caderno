@@ -178,6 +178,8 @@ class ApiManager {
     }
 
     async createNotebook(data) {
+        console.log('API createNotebook - dados recebidos:', data);
+        console.log('API createNotebook - JSON stringified:', JSON.stringify(data));
         return await this.request('/notebooks', {
             method: 'POST',
             body: JSON.stringify(data)

@@ -260,6 +260,8 @@ async function createNewSection() {
 
 async function createNewNotebook(sectionId = null) {
     const title = prompt('Título do novo caderno:');
+    console.log('Título capturado:', title);
+    console.log('Título após trim:', title ? title.trim() : 'null');
     if (title && title.trim()) {
         try {
             // Se não foi passado sectionId, verificar se há seções disponíveis
@@ -284,11 +286,13 @@ async function createNewNotebook(sectionId = null) {
                 }
             }
 
-            await apiManager.createNotebook({
+            const notebookData = {
                 name: title.trim(),
                 section_id: sectionId,
                 content: ''
-            });
+            };
+            console.log('Dados enviados para API:', notebookData);
+            await apiManager.createNotebook(notebookData);
             
             await notebookSystem.loadNotebooks();
             notebookSystem.showSuccess('Caderno criado com sucesso!');
