@@ -1,8 +1,25 @@
 // Classe para gerenciar chamadas da API
 class ApiManager {
     constructor() {
-        this.baseUrl = 'http://localhost:3000/api';
+        // Detecta automaticamente o ambiente
+        const isProduction = window.location.hostname === 'mociap.github.io';
+        
+        // Configuração da URL da API
+        if (isProduction) {
+            // Em produção, tenta usar URL configurada ou padrão Railway
+            this.baseUrl = localStorage.getItem('apiUrl') || 'https://book-notion-production.up.railway.app/api';
+        } else {
+            // Em desenvolvimento, usa localhost
+            this.baseUrl = 'http://localhost:3000/api';
+        }
+        
         this.token = localStorage.getItem('authToken');
+    }
+
+    // Método para configurar URL da API (útil para produção)
+    setApiUrl(url) {
+        this.baseUrl = url.endsWith('/api') ? url : `${url}/api`;
+        localStorage.setItem('apiUrl', this.baseUrl);
     }
 
     // Método para fazer requisições HTTP
