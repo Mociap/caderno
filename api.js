@@ -1,24 +1,7 @@
 // Classe para gerenciar chamadas da API
 class ApiManager {
     constructor() {
-        // Detectar automaticamente o ambiente
-        const isGitHubPages = window.location.hostname.includes('github.io');
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        
-        if (isGitHubPages) {
-            // Para GitHub Pages, usar uma API externa ou mock
-            this.baseUrl = 'https://api.exemplo.com/api'; // Substitua pela sua API real
-            this.isOnlineMode = false; // Usar modo offline por enquanto
-        } else if (isLocalhost) {
-            // Para desenvolvimento local
-            this.baseUrl = 'http://localhost:3000/api';
-            this.isOnlineMode = true;
-        } else {
-            // Para outros ambientes
-            this.baseUrl = 'http://localhost:3000/api';
-            this.isOnlineMode = true;
-        }
-        
+        this.baseUrl = 'http://localhost:3000/api';
         this.token = localStorage.getItem('authToken');
     }
 
@@ -68,23 +51,6 @@ class ApiManager {
 
     // Métodos de autenticação
     async register(username, email, password) {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages
-            const user = {
-                id: Date.now(),
-                username,
-                email,
-                created_at: new Date().toISOString()
-            };
-            
-            const token = 'offline_token_' + Date.now();
-            this.token = token;
-            localStorage.setItem('authToken', token);
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            
-            return { user, token };
-        }
-        
         const data = await this.request('/auth/register', {
             method: 'POST',
             body: JSON.stringify({ username, email, password })
@@ -99,20 +65,6 @@ class ApiManager {
     }
 
     async login(email, password) {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages
-            const storedUser = localStorage.getItem('currentUser');
-            if (storedUser) {
-                const user = JSON.parse(storedUser);
-                const token = 'offline_token_' + Date.now();
-                this.token = token;
-                localStorage.setItem('authToken', token);
-                return { user, token };
-            } else {
-                throw new Error('Usuário não encontrado. Registre-se primeiro.');
-            }
-        }
-        
         const data = await this.request('/auth/login', {
             method: 'POST',
             body: JSON.stringify({ email, password })
@@ -132,45 +84,15 @@ class ApiManager {
     }
 
     async getCurrentUser() {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages
-            const storedUser = localStorage.getItem('currentUser');
-            return storedUser ? JSON.parse(storedUser) : null;
-        }
-        
         return await this.request('/auth/me');
     }
 
     // Métodos de seções
     async getSections() {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages - usar DatabaseManager
-            if (window.dbManager && window.dbManager.isInitialized) {
-                return window.dbManager.getSections();
-            } else {
-                // Inicializar DatabaseManager se necessário
-                if (window.dbManager) {
-                    await window.dbManager.init();
-                    return window.dbManager.getSections();
-                }
-                return [];
-            }
-        }
-        
         return await this.request('/sections');
     }
 
     async createSection(data) {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages - usar DatabaseManager
-            if (window.dbManager && window.dbManager.isInitialized) {
-                const name = typeof data === 'string' ? data : data.name;
-                return await window.dbManager.createSection(name);
-            } else {
-                throw new Error('Database não inicializado');
-            }
-        }
-        
         return await this.request('/sections', {
             method: 'POST',
             body: JSON.stringify(data)
@@ -196,36 +118,11 @@ class ApiManager {
 
     // Métodos de notebooks
     async getNotebooks(sectionId = null) {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages - usar DatabaseManager
-            if (window.dbManager && window.dbManager.isInitialized) {
-                if (sectionId) {
-                    return window.dbManager.getNotebooksBySection(sectionId);
-                } else {
-                    return window.dbManager.getNotebooks();
-                }
-            } else {
-                return [];
-            }
-        }
-        
         const endpoint = sectionId ? `/notebooks?sectionId=${sectionId}` : '/notebooks';
         return await this.request(endpoint);
     }
 
     async createNotebook(data) {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages - usar DatabaseManager
-            if (window.dbManager && window.dbManager.isInitialized) {
-                const title = data.title || data.name;
-                const sectionId = data.section_id || data.sectionId;
-                const content = data.content || '';
-                return await window.dbManager.createNotebook(title, sectionId, null, 0);
-            } else {
-                throw new Error('Database não inicializado');
-            }
-        }
-        
         return await this.request('/notebooks', {
             method: 'POST',
             body: JSON.stringify(data)
@@ -233,28 +130,10 @@ class ApiManager {
     }
 
     async getNotebook(id) {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages - usar DatabaseManager
-            if (window.dbManager && window.dbManager.isInitialized) {
-                return window.dbManager.getItemById(id);
-            } else {
-                return null;
-            }
-        }
-        
         return await this.request(`/notebooks/${id}`);
     }
 
     async updateNotebook(id, data) {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages - usar DatabaseManager
-            if (window.dbManager && window.dbManager.isInitialized) {
-                return window.dbManager.updateNotebook(id, data);
-            } else {
-                throw new Error('Database não inicializado');
-            }
-        }
-        
         return await this.request(`/notebooks/${id}`, {
             method: 'PUT',
             body: JSON.stringify(data)
@@ -269,15 +148,6 @@ class ApiManager {
     }
 
     async deleteNotebook(id) {
-        if (!this.isOnlineMode) {
-            // Modo offline para GitHub Pages - usar DatabaseManager
-            if (window.dbManager && window.dbManager.isInitialized) {
-                return window.dbManager.deleteNotebook(id);
-            } else {
-                throw new Error('Database não inicializado');
-            }
-        }
-        
         return await this.request(`/notebooks/${id}`, {
             method: 'DELETE'
         });
