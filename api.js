@@ -8,11 +8,11 @@ class ApiManager {
         // Configuração da URL da API
         if (isProduction) {
             // Em produção, usa URL configurada ou fallback para Render
-            this.baseUrl = localStorage.getItem('apiUrl') || 'https://book-notion-api.onrender.com/api';
+            this.baseUrl = localStorage.getItem('apiUrl') || 'https://book-notion-api-t1ep.onrender.com/api';
             
             // Lista de fallbacks em ordem de prioridade (sem localhost)
             this.fallbackUrls = [
-                'https://book-notion-api.onrender.com/api',
+                'https://book-notion-api-t1ep.onrender.com/api',
                 'https://book-notion-production.up.railway.app/api'
             ];
             
