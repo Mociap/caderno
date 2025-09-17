@@ -201,6 +201,15 @@ class NotebookSystem {
         if (titleElement) {
             titleElement.textContent = notebook.name;
         }
+
+        // Atualizar o campo de título editável
+        const titleInput = document.getElementById('notebookTitle');
+        if (titleInput) {
+            titleInput.value = notebook.name;
+        }
+
+        // Configurar sincronização em tempo real
+        setupRealTimeSync();
     }
 
     updateActiveNotebook(notebookId) {
@@ -259,47 +268,60 @@ async function createNewSection() {
 }
 
 async function createNewNotebook(sectionId = null) {
-    const title = prompt('Título do novo caderno:');
-    console.log('Título capturado:', title);
-    console.log('Título após trim:', title ? title.trim() : 'null');
-    if (title && title.trim()) {
-        try {
-            // Se não foi passado sectionId, verificar se há seções disponíveis
-            if (!sectionId) {
-                const sections = await apiManager.getSections();
-                if (sections.length === 0) {
-                    notebookSystem.showError('Crie uma seção primeiro');
-                    return;
-                }
-
-                // Se há apenas uma seção, usar ela. Senão, perguntar qual usar
-                if (sections.length === 1) {
-                    sectionId = sections[0].id;
-                } else {
-                    const sectionName = prompt(`Escolha uma seção:\n${sections.map(s => s.name).join('\n')}`);
-                    const selectedSection = sections.find(s => s.name === sectionName);
-                    if (!selectedSection) {
-                        notebookSystem.showError('Seção não encontrada');
-                        return;
-                    }
-                    sectionId = selectedSection.id;
-                }
+    try {
+        // Se não foi passado sectionId, verificar se há seções disponíveis
+        if (!sectionId) {
+            const sections = await apiManager.getSections();
+            if (sections.length === 0) {
+                notebookSystem.showError('Crie uma seção primeiro');
+                return;
             }
 
-            const notebookData = {
-                name: title.trim(),
-                section_id: sectionId,
-                content: ''
-            };
-            console.log('Dados enviados para API:', notebookData);
-            await apiManager.createNotebook(notebookData);
-            
-            await notebookSystem.loadNotebooks();
-            notebookSystem.showSuccess('Caderno criado com sucesso!');
-        } catch (error) {
-            console.error('Erro ao criar caderno:', error);
-            notebookSystem.showError('Erro ao criar caderno');
+            // Se há apenas uma seção, usar ela. Senão, perguntar qual usar
+            if (sections.length === 1) {
+                sectionId = sections[0].id;
+            } else {
+                const sectionName = prompt(`Escolha uma seção:\n${sections.map(s => s.name).join('\n')}`);
+                const selectedSection = sections.find(s => s.name === sectionName);
+                if (!selectedSection) {
+                    notebookSystem.showError('Seção não encontrada');
+                    return;
+                }
+                sectionId = selectedSection.id;
+            }
         }
+
+        // Criar caderno com nome padrão
+        const defaultName = 'Novo Caderno';
+        const notebookData = {
+            name: defaultName,
+            section_id: sectionId,
+            content: ''
+        };
+        
+        const newNotebook = await apiManager.createNotebook(notebookData);
+        
+        // Recarregar lista e selecionar o novo caderno
+        await notebookSystem.loadNotebooks();
+        
+        // Selecionar o novo caderno automaticamente
+        if (newNotebook && newNotebook.id) {
+            await notebookSystem.selectNotebook(newNotebook.id);
+            
+            // Focar no campo de título para edição
+            setTimeout(() => {
+                const titleInput = document.getElementById('notebookTitle');
+                if (titleInput) {
+                    titleInput.select(); // Seleciona todo o texto para facilitar a edição
+                    titleInput.focus();
+                }
+            }, 100);
+        }
+        
+        notebookSystem.showSuccess('Caderno criado! Digite o título desejado.');
+    } catch (error) {
+        console.error('Erro ao criar caderno:', error);
+        notebookSystem.showError('Erro ao criar caderno');
     }
 }
 
@@ -448,13 +470,52 @@ async function updateNotebookTitle() {
             name: newTitle
         });
         
-        // Atualizar o título na interface
+        // Atualizar o título na interface local
         notebookSystem.currentNotebook.name = newTitle;
-        await notebookSystem.loadNotebooks(); // Recarregar lista
+        
+        // Atualizar o nome na aba lateral sem recarregar toda a lista
+        updateNotebookNameInSidebar(notebookSystem.currentNotebook.id, newTitle);
+        
         notebookSystem.showSuccess('Título atualizado com sucesso!');
     } catch (error) {
         console.error('Erro ao atualizar título:', error);
         notebookSystem.showError('Erro ao atualizar título');
+    }
+}
+
+// Função para atualizar o nome do caderno na aba lateral
+function updateNotebookNameInSidebar(notebookId, newName) {
+    // Encontrar o elemento do notebook na aba lateral
+    const notebookElements = document.querySelectorAll('.notebook-item');
+    notebookElements.forEach(element => {
+        const notebookContent = element.querySelector('.notebook-content');
+        if (notebookContent && notebookContent.getAttribute('onclick').includes(notebookId)) {
+            const nameSpan = element.querySelector('.notebook-name');
+            if (nameSpan) {
+                nameSpan.textContent = newName;
+            }
+        }
+    });
+}
+
+// Função para sincronização em tempo real enquanto o usuário digita
+function setupRealTimeSync() {
+    const titleInput = document.getElementById('notebookTitle');
+    if (!titleInput) return;
+    
+    // Remover listeners anteriores para evitar duplicação
+    titleInput.removeEventListener('input', handleTitleInput);
+    titleInput.addEventListener('input', handleTitleInput);
+}
+
+// Handler para sincronização em tempo real
+function handleTitleInput(event) {
+    if (!notebookSystem || !notebookSystem.currentNotebook) return;
+    
+    const newTitle = event.target.value.trim();
+    if (newTitle) {
+        // Atualizar imediatamente na aba lateral (sem salvar no servidor ainda)
+        updateNotebookNameInSidebar(notebookSystem.currentNotebook.id, newTitle);
     }
 }
 
