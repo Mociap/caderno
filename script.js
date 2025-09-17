@@ -285,7 +285,7 @@ async function createNewNotebook(sectionId = null) {
             }
 
             await apiManager.createNotebook({
-                title: title.trim(),
+                name: title.trim(),
                 section_id: sectionId,
                 content: ''
             });
