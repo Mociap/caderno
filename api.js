@@ -2,12 +2,19 @@
 class ApiManager {
     constructor() {
         // Detecta automaticamente o ambiente
-        const isProduction = window.location.hostname === 'mociap.github.io';
+        const isProduction = window.location.hostname === 'mociap.github.io' && 
+                             window.location.pathname.startsWith('/caderno');
         //
         // Configuração da URL da API
         if (isProduction) {
-            // Em produção, tenta usar URL configurada ou padrão Railway
-            this.baseUrl = localStorage.getItem('apiUrl') || 'https://book-notion-production.up.railway.app/api';
+            // Em produção, tenta usar URL configurada pelo usuário
+            this.baseUrl = localStorage.getItem('apiUrl') || null;
+            
+            // Se não há URL configurada, mostra aviso
+            if (!this.baseUrl) {
+                console.warn('⚠️ URL da API não configurada. Configure com: apiManager.setApiUrl("https://sua-url-do-servidor.com")');
+                this.baseUrl = 'https://book-notion-production.up.railway.app/api'; // fallback
+            }
         } else {
             // Em desenvolvimento, usa localhost
             this.baseUrl = 'http://localhost:3000/api';
@@ -56,7 +63,15 @@ class ApiManager {
         } catch (error) {
             // Se for erro de rede (fetch falhou)
             if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                const networkError = new Error('Erro de conexão. Verifique se o servidor está funcionando.');
+                const isProduction = window.location.hostname === 'mociap.github.io';
+                let networkError;
+                
+                if (isProduction) {
+                    networkError = new Error(`Erro de conexão com o servidor: ${this.baseUrl}\n\nVerifique se:\n1. O servidor está rodando\n2. A URL está correta\n3. Configure a URL correta com: apiManager.setApiUrl("https://sua-url-do-servidor.com")`);
+                } else {
+                    networkError = new Error('Erro de conexão. Verifique se o servidor está funcionando.');
+                }
+                
                 networkError.code = 'NETWORK_ERROR';
                 throw networkError;
             }
