@@ -451,9 +451,7 @@ function changeTextColor() {
     }
 }
 
-function debugIndexedDB() {
-    console.log('Debug não disponível no modo API');
-}
+
 
 // Função para atualizar título do notebook
 async function updateNotebookTitle() {
