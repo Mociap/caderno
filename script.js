@@ -132,7 +132,10 @@ class NotebookSystem {
 
     async loadNotebooksForSection(sectionId) {
         try {
-            const notebooks = await apiManager.getNotebooks(sectionId);
+            const response = await apiManager.getNotebooks(sectionId);
+            // Garantir que notebooks seja sempre um array
+            const notebooks = Array.isArray(response) ? response : [];
+            
             const container = document.getElementById(`notebooks-${sectionId}`);
             if (!container) return;
 

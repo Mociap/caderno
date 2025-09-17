@@ -10,18 +10,20 @@ router.use(authenticateToken);
  * GET /api/notebooks
  * Busca todos os cadernos do usuário
  */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const { section_id } = req.query;
         
         let notebooks;
         if (section_id) {
-            notebooks = req.db.getNotebooksBySection(section_id, req.user.userId);
+            notebooks = await req.db.getNotebooksBySection(section_id, req.user.userId);
         } else {
-            notebooks = req.db.getNotebooksByUser(req.user.userId);
+            notebooks = await req.db.getNotebooksByUser(req.user.userId);
         }
         
-        res.json(notebooks);
+        // Garantir que sempre retorna um array
+        const notebooksArray = Array.isArray(notebooks) ? notebooks : [];
+        res.json(notebooksArray);
     } catch (error) {
         console.error('Erro ao buscar cadernos:', error);
         res.status(500).json({ error: 'Erro interno do servidor' });
@@ -32,10 +34,10 @@ router.get('/', (req, res) => {
  * GET /api/notebooks/:id
  * Busca um caderno específico
  */
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const notebook = req.db.getItemById(id, req.user.userId);
+        const notebook = await req.db.getItemById(id, req.user.userId);
         
         if (!notebook || notebook.type !== 'notebook') {
             return res.status(404).json({ error: 'Caderno não encontrado' });
@@ -52,7 +54,7 @@ router.get('/:id', (req, res) => {
  * POST /api/notebooks
  * Cria um novo caderno
  */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const { name, section_id, content = '' } = req.body;
 
@@ -65,12 +67,12 @@ router.post('/', (req, res) => {
         }
 
         // Verifica se a seção existe e pertence ao usuário
-        const section = req.db.getItemById(section_id, req.user.userId);
+        const section = await req.db.getItemById(section_id, req.user.userId);
         if (!section || section.type !== 'section') {
             return res.status(404).json({ error: 'Seção não encontrada' });
         }
 
-        const notebook = req.db.createNotebook(name.trim(), section_id, content, req.user.userId);
+        const notebook = await req.db.createNotebook(name.trim(), section_id, content, req.user.userId);
         res.status(201).json(notebook);
 
     } catch (error) {
