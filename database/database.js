@@ -298,12 +298,14 @@ class DatabaseManager {
      * Cria um novo caderno
      */
     async createNotebook(name, sectionId, content = '', userId) {
+        console.log('🔍 DB createNotebook - parâmetros:', { name, sectionId, content, userId });
         const sql = `
             INSERT INTO items (name, type, content, parent_id, user_id) 
             VALUES (?, 'notebook', ?, ?, ?)
         `;
         const result = await this.exec(sql, [name, content, sectionId, userId]);
-        return { 
+        console.log('🔍 DB createNotebook - resultado:', result);
+        const notebook = { 
             id: result.lastID, 
             name, 
             type: 'notebook', 
@@ -311,6 +313,8 @@ class DatabaseManager {
             parent_id: sectionId, 
             user_id: userId 
         };
+        console.log('🔍 DB createNotebook - notebook criado:', notebook);
+        return notebook;
     }
 
     /**

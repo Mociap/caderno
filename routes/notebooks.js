@@ -73,6 +73,7 @@ router.post('/', async (req, res) => {
         }
 
         const notebook = await req.db.createNotebook(name.trim(), section_id, content, req.user.userId);
+        console.log('🔍 Rota POST - notebook criado:', notebook);
         res.status(201).json(notebook);
 
     } catch (error) {
