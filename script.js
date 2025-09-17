@@ -433,6 +433,44 @@ function debugIndexedDB() {
     console.log('Debug não disponível no modo API');
 }
 
+// Função para atualizar título do notebook
+async function updateNotebookTitle() {
+    if (!notebookSystem || !notebookSystem.currentNotebook) return;
+    
+    const titleInput = document.getElementById('notebookTitle');
+    if (!titleInput) return;
+    
+    const newTitle = titleInput.value.trim();
+    if (!newTitle) return;
+    
+    try {
+        await apiManager.updateNotebook(notebookSystem.currentNotebook.id, {
+            name: newTitle
+        });
+        
+        // Atualizar o título na interface
+        notebookSystem.currentNotebook.name = newTitle;
+        await notebookSystem.loadNotebooks(); // Recarregar lista
+        notebookSystem.showSuccess('Título atualizado com sucesso!');
+    } catch (error) {
+        console.error('Erro ao atualizar título:', error);
+        notebookSystem.showError('Erro ao atualizar título');
+    }
+}
+
+// Função para salvamento manual
+async function manualSave() {
+    if (!notebookSystem) return;
+    
+    try {
+        await notebookSystem.saveCurrentContent();
+        notebookSystem.showSuccess('Conteúdo salvo com sucesso!');
+    } catch (error) {
+        console.error('Erro ao salvar:', error);
+        notebookSystem.showError('Erro ao salvar conteúdo');
+    }
+}
+
 // Inicializar sistema quando a página carregar
 let notebookSystem;
 document.addEventListener('DOMContentLoaded', async () => {

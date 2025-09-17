@@ -85,13 +85,13 @@ router.post('/', async (req, res) => {
  * PUT /api/notebooks/:id
  * Atualiza um caderno
  */
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { name, content, section_id } = req.body;
 
         // Verifica se o caderno existe e pertence ao usuário
-        const existingNotebook = req.db.getItemById(id, req.user.userId);
+        const existingNotebook = await req.db.getItemById(id, req.user.userId);
         if (!existingNotebook || existingNotebook.type !== 'notebook') {
             return res.status(404).json({ error: 'Caderno não encontrado' });
         }
@@ -103,7 +103,7 @@ router.put('/:id', (req, res) => {
 
         // Se section_id foi fornecido, verifica se a seção existe
         if (section_id && section_id !== existingNotebook.parent_id) {
-            const section = req.db.getItemById(section_id, req.user.userId);
+            const section = await req.db.getItemById(section_id, req.user.userId);
             if (!section || section.type !== 'section') {
                 return res.status(404).json({ error: 'Seção não encontrada' });
             }
@@ -133,7 +133,7 @@ router.put('/:id', (req, res) => {
  * PATCH /api/notebooks/:id/content
  * Atualiza apenas o conteúdo de um caderno (para salvamento automático)
  */
-router.patch('/:id/content', (req, res) => {
+router.patch('/:id/content', async (req, res) => {
     try {
         const { id } = req.params;
         const { content } = req.body;
@@ -143,7 +143,7 @@ router.patch('/:id/content', (req, res) => {
         }
 
         // Verifica se o caderno existe e pertence ao usuário
-        const existingNotebook = req.db.getItemById(id, req.user.userId);
+        const existingNotebook = await req.db.getItemById(id, req.user.userId);
         if (!existingNotebook || existingNotebook.type !== 'notebook') {
             return res.status(404).json({ error: 'Caderno não encontrado' });
         }
@@ -166,12 +166,12 @@ router.patch('/:id/content', (req, res) => {
  * DELETE /api/notebooks/:id
  * Deleta um caderno
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
         // Verifica se o caderno existe e pertence ao usuário
-        const existingNotebook = req.db.getItemById(id, req.user.userId);
+        const existingNotebook = await req.db.getItemById(id, req.user.userId);
         if (!existingNotebook || existingNotebook.type !== 'notebook') {
             return res.status(404).json({ error: 'Caderno não encontrado' });
         }
