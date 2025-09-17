@@ -7,21 +7,16 @@ class ApiManager {
         //
         // Configuração da URL da API
         if (isProduction) {
-            // Em produção, tenta usar URL configurada pelo usuário
-            this.baseUrl = localStorage.getItem('apiUrl') || null;
+            // Em produção, usa URL configurada ou fallback para Render
+            this.baseUrl = localStorage.getItem('apiUrl') || 'https://book-notion-api.onrender.com/api';
             
-            // Se não há URL configurada, usa fallbacks
-            if (!this.baseUrl) {
-                console.warn('⚠️ URL da API não configurada. Configure com: apiManager.setApiUrl("https://sua-url-do-servidor.com")');
-                console.info('💡 Instruções de deploy: consulte RENDER_DEPLOY.md');
-                // Lista de fallbacks em ordem de prioridade
-                this.fallbackUrls = [
-                    'https://book-notion-production.up.railway.app/api',
-                    'https://book-notion-api.onrender.com/api',
-                    'http://localhost:3000/api' // último recurso
-                ];
-                this.baseUrl = this.fallbackUrls[0];
-            }
+            // Lista de fallbacks em ordem de prioridade (sem localhost)
+            this.fallbackUrls = [
+                'https://book-notion-api.onrender.com/api',
+                'https://book-notion-production.up.railway.app/api'
+            ];
+            
+            console.info('🚀 Usando servidor de produção:', this.baseUrl);
         } else {
             // Em desenvolvimento, usa localhost
             this.baseUrl = 'http://localhost:3000/api';
@@ -89,7 +84,7 @@ class ApiManager {
                 let networkError;
                 
                 if (isProduction) {
-                    networkError = new Error(`❌ Todos os servidores estão indisponíveis.\n\n🚀 Soluções:\n1. Deploy no Render: consulte RENDER_DEPLOY.md\n2. Configure URL manual: apiManager.setApiUrl("https://sua-url.com/api")\n3. Use ngrok para teste local\n\n💡 Último servidor tentado: ${this.baseUrl}`);
+                    networkError = new Error(`❌ Servidores de produção indisponíveis.\n\n🚀 O servidor está sendo configurado...\nTente novamente em alguns minutos.\n\n💡 Servidor tentado: ${this.baseUrl}`);
                 } else {
                     networkError = new Error('Erro de conexão. Verifique se o servidor está funcionando.');
                 }
