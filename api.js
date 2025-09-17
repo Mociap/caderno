@@ -2,8 +2,7 @@
 class ApiManager {
     constructor() {
         // Detecta automaticamente o ambiente
-        const isProduction = window.location.hostname === 'mociap.github.io' && 
-                             window.location.pathname.startsWith('/caderno/');
+        const isProduction = window.location.hostname === 'mociap.github.io';
         //
         // Configuração da URL da API
         if (isProduction) {
