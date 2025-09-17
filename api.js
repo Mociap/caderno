@@ -7,6 +7,13 @@ class ApiManager {
         //
         // Configuração da URL da API
         if (isProduction) {
+            // Verifica se há URL antiga no localStorage e força atualização
+            const storedUrl = localStorage.getItem('apiUrl');
+            if (storedUrl && storedUrl.includes('book-notion-api.onrender.com')) {
+                console.warn('🔄 Detectada URL antiga no cache, atualizando...');
+                localStorage.removeItem('apiUrl');
+            }
+            
             // Em produção, usa URL configurada ou fallback para Render
             this.baseUrl = localStorage.getItem('apiUrl') || 'https://book-notion-api-t1ep.onrender.com/api';
             
