@@ -3,17 +3,24 @@ class ApiManager {
     constructor() {
         // Detecta automaticamente o ambiente
         const isProduction = window.location.hostname === 'mociap.github.io' && 
-                             window.location.pathname.startsWith('/caderno');
+                             window.location.pathname.startsWith('/caderno/');
         //
         // Configuração da URL da API
         if (isProduction) {
             // Em produção, tenta usar URL configurada pelo usuário
             this.baseUrl = localStorage.getItem('apiUrl') || null;
             
-            // Se não há URL configurada, mostra aviso
+            // Se não há URL configurada, usa fallbacks
             if (!this.baseUrl) {
                 console.warn('⚠️ URL da API não configurada. Configure com: apiManager.setApiUrl("https://sua-url-do-servidor.com")');
-                this.baseUrl = 'https://book-notion-production.up.railway.app/api'; // fallback
+                console.info('💡 Instruções de deploy: consulte RENDER_DEPLOY.md');
+                // Lista de fallbacks em ordem de prioridade
+                this.fallbackUrls = [
+                    'https://book-notion-production.up.railway.app/api',
+                    'https://book-notion-api.onrender.com/api',
+                    'http://localhost:3000/api' // último recurso
+                ];
+                this.baseUrl = this.fallbackUrls[0];
             }
         } else {
             // Em desenvolvimento, usa localhost
@@ -61,13 +68,28 @@ class ApiManager {
 
             return data;
         } catch (error) {
-            // Se for erro de rede (fetch falhou)
+            // Se for erro de rede (fetch falhou) e temos fallbacks disponíveis
+            if (error.name === 'TypeError' && error.message.includes('fetch') && this.fallbackUrls) {
+                console.warn(`❌ Falha ao conectar com: ${this.baseUrl}`);
+                
+                // Tenta próximo fallback
+                const currentIndex = this.fallbackUrls.indexOf(this.baseUrl);
+                if (currentIndex < this.fallbackUrls.length - 1) {
+                    this.baseUrl = this.fallbackUrls[currentIndex + 1];
+                    console.info(`🔄 Tentando servidor alternativo: ${this.baseUrl}`);
+                    
+                    // Tenta novamente com o novo URL
+                    return this.request(endpoint, options);
+                }
+            }
+            
+            // Se for erro de rede (fetch falhou) e não há mais fallbacks
             if (error.name === 'TypeError' && error.message.includes('fetch')) {
                 const isProduction = window.location.hostname === 'mociap.github.io';
                 let networkError;
                 
                 if (isProduction) {
-                    networkError = new Error(`Erro de conexão com o servidor: ${this.baseUrl}\n\nVerifique se:\n1. O servidor está rodando\n2. A URL está correta\n3. Configure a URL correta com: apiManager.setApiUrl("https://sua-url-do-servidor.com")`);
+                    networkError = new Error(`❌ Todos os servidores estão indisponíveis.\n\n🚀 Soluções:\n1. Deploy no Render: consulte RENDER_DEPLOY.md\n2. Configure URL manual: apiManager.setApiUrl("https://sua-url.com/api")\n3. Use ngrok para teste local\n\n💡 Último servidor tentado: ${this.baseUrl}`);
                 } else {
                     networkError = new Error('Erro de conexão. Verifique se o servidor está funcionando.');
                 }
