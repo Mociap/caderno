@@ -1,45 +1,41 @@
-# 🚀 Deploy Automático - Render
+# 🚀 Deploy Automático no Render
 
-## ⚡ Deploy em 3 Passos
+## ⚡ Passos Rápidos (5 minutos):
 
-### 1. 📤 Fazer Push para GitHub
-```bash
-git add .
-git commit -m "Configuração para produção"
-git push origin main
-```
+### 1. **Acesse o Render**
+   - Vá para: https://render.com
+   - Faça login com sua conta GitHub
 
-### 2. 🌐 Deploy no Render
-1. Acesse: https://render.com
-2. Faça login com GitHub
-3. Clique em "New +" → "Web Service"
-4. Conecte: `Mociap/caderno`
-5. **Nome**: `book-notion-api`
-6. **Build Command**: `npm install`
-7. **Start Command**: `npm start`
-8. Clique em "Create Web Service"
+### 2. **Criar Novo Serviço**
+   - Clique em **"New +"** → **"Web Service"**
+   - Conecte o repositório: **`Mociap/caderno`**
+   - Nome do serviço: **`book-notion-api`**
+   - Branch: **`main`**
 
-### 3. ⚙️ Configurar Variáveis (Automático)
-O arquivo `render.yaml` já configura tudo automaticamente:
-- ✅ NODE_ENV=production
-- ✅ JWT_SECRET (gerado automaticamente)
-- ✅ FRONTEND_URL=https://mociap.github.io
-- ✅ PORT=10000
+### 3. **Configuração Automática**
+   ✅ O arquivo `render.yaml` já está configurado!
+   
+   **Variáveis que serão configuradas automaticamente:**
+   - `NODE_ENV=production`
+   - `JWT_SECRET=seu-jwt-secret-super-seguro-aqui`
+   - `FRONTEND_URL=https://mociap.github.io`
+   - `PORT=10000`
 
-## 🎯 URL Final
+### 4. **Deploy**
+   - Clique em **"Create Web Service"**
+   - Aguarde 5-10 minutos para o deploy
+
+## 🎯 **URL Final:**
 Após o deploy: `https://book-notion-api.onrender.com`
 
-## ✅ Resultado
-- ✅ GitHub Pages funcionará automaticamente
+## ✅ **Resultado Esperado:**
+- ✅ GitHub Pages: `https://mociap.github.io/caderno/`
+- ✅ API funcionando automaticamente
 - ✅ Sem configuração manual necessária
-- ✅ Fallback automático entre servidores
-- ✅ CORS configurado corretamente
 
-## 🕐 Tempo de Deploy
-- **Primeiro deploy**: 5-10 minutos
-- **Deploys futuros**: 2-3 minutos
-- **Cold start**: ~30 segundos (primeira requisição)
+## 🔧 **Se der erro:**
+1. Verifique se as variáveis de ambiente estão corretas
+2. Aguarde alguns minutos (primeiro deploy pode demorar)
+3. Verifique os logs no painel do Render
 
-## 🧪 Testar
-Após deploy, acesse: `https://mociap.github.io/caderno/`
-Deve funcionar automaticamente!
+**Tempo total: 5-10 minutos** ⏱️
