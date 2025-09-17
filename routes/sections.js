@@ -65,7 +65,7 @@ router.post('/', async (req, res) => {
  * PUT /api/sections/:id
  * Atualiza uma seção
  */
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { name } = req.body;
@@ -75,12 +75,12 @@ router.put('/:id', (req, res) => {
         }
 
         // Verifica se a seção existe e pertence ao usuário
-        const existingSection = req.db.getItemById(id, req.user.userId);
+        const existingSection = await req.db.getItemById(id, req.user.userId);
         if (!existingSection || existingSection.type !== 'section') {
             return res.status(404).json({ error: 'Seção não encontrada' });
         }
 
-        const result = req.db.updateSection(id, name.trim(), req.user.userId);
+        const result = await req.db.updateSection(id, name.trim(), req.user.userId);
         
         if (result.changes === 0) {
             return res.status(404).json({ error: 'Seção não encontrada' });
@@ -98,20 +98,20 @@ router.put('/:id', (req, res) => {
  * DELETE /api/sections/:id
  * Deleta uma seção e todos os cadernos relacionados
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
         // Verifica se a seção existe e pertence ao usuário
-        const existingSection = req.db.getItemById(id, req.user.userId);
+        const existingSection = await req.db.getItemById(id, req.user.userId);
         if (!existingSection || existingSection.type !== 'section') {
             return res.status(404).json({ error: 'Seção não encontrada' });
         }
 
         // Conta quantos cadernos serão deletados
-        const notebookCount = req.db.countNotebooksInSection(id, req.user.userId);
+        const notebookCount = await req.db.countNotebooksInSection(id, req.user.userId);
 
-        const result = req.db.deleteSection(id, req.user.userId);
+        const result = await req.db.deleteSection(id, req.user.userId);
         
         if (result.changes === 0) {
             return res.status(404).json({ error: 'Seção não encontrada' });
@@ -132,17 +132,17 @@ router.delete('/:id', (req, res) => {
  * GET /api/sections/:id/notebooks
  * Busca todos os cadernos de uma seção
  */
-router.get('/:id/notebooks', (req, res) => {
+router.get('/:id/notebooks', async (req, res) => {
     try {
         const { id } = req.params;
 
         // Verifica se a seção existe e pertence ao usuário
-        const existingSection = req.db.getItemById(id, req.user.userId);
+        const existingSection = await req.db.getItemById(id, req.user.userId);
         if (!existingSection || existingSection.type !== 'section') {
             return res.status(404).json({ error: 'Seção não encontrada' });
         }
 
-        const notebooks = req.db.getNotebooksBySection(id, req.user.userId);
+        const notebooks = await req.db.getNotebooksBySection(id, req.user.userId);
         res.json(notebooks);
 
     } catch (error) {
@@ -155,17 +155,17 @@ router.get('/:id/notebooks', (req, res) => {
  * GET /api/sections/:id/stats
  * Busca estatísticas de uma seção
  */
-router.get('/:id/stats', (req, res) => {
+router.get('/:id/stats', async (req, res) => {
     try {
         const { id } = req.params;
 
         // Verifica se a seção existe e pertence ao usuário
-        const existingSection = req.db.getItemById(id, req.user.userId);
+        const existingSection = await req.db.getItemById(id, req.user.userId);
         if (!existingSection || existingSection.type !== 'section') {
             return res.status(404).json({ error: 'Seção não encontrada' });
         }
 
-        const notebookCount = req.db.countNotebooksInSection(id, req.user.userId);
+        const notebookCount = await req.db.countNotebooksInSection(id, req.user.userId);
         
         res.json({
             sectionId: id,
